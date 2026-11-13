@@ -1,0 +1,1 @@
+import{I as i,J as o}from"./index-D-DmdU9n.js";const c=()=>({cityList:[]}),n={getCityListAction(){return new Promise((s,e)=>{o().then(t=>{this.cityList=t,s()}).catch(t=>{e(t)})})}},a=i("house",{state:c,actions:n});export{a as u};
