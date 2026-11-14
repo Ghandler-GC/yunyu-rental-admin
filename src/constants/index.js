@@ -75,7 +75,8 @@ export const HOUSE_TAG_MAP = {
   civil_water_elec: '民水民电',
   lift: '有电梯',
   central_heating: '集中供暖',
-  renovation: '精装修'
+  renovation: '精装修',
+  cook: '可做饭'
 }
 
 // 图片云服务器的基础地址

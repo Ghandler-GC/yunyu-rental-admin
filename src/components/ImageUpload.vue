@@ -133,7 +133,10 @@
     <el-upload
       :disabled="props.disabled"
       class="image-uploader"
-      :class="{ hidePictureCard: fileList.length >= props.limit }"
+      :class="{
+        hidePictureCard:
+          fileList.length >= props.limit || props.disabled
+      }"
       list-type="picture-card"
       :file-list="fileList"
       :before-upload="onBeforeUpload"

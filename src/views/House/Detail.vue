@@ -4,13 +4,38 @@
     DEVICE_LIST_MAP,
     POSITION_LIST_MAP,
     IMAGE_HOST,
-    ROOM_NUM_MAP
+    ROOM_NUM_MAP,
+    HOUSE_RENT_TYPE_MAP
   } from '@/constants'
   import { getHouseDetailApi } from '@/api/house'
-  import { useRoute } from 'vue-router'
+  import { useRoute, useRouter } from 'vue-router'
   import { ref, computed } from 'vue'
   const route = useRoute()
+  const router = useRouter()
   const houseDetail = ref({})
+
+  // 跳转到编辑页（详情页本身为只读，需要修改信息请进入编辑页）
+  const goToEdit = () => {
+    router.push(`/house/addOrEdit/${route.params.houseId}`)
+  }
+
+  // 拼接完整地址，避免出现“西安市市”“碑林区碑林区”这类重复内容
+  const fullAddress = computed(() => {
+    const {
+      cityName = '',
+      regionName = '',
+      communityName = '',
+      detailAddress = ''
+    } = houseDetail.value
+    let address = cityName
+    if (regionName && !detailAddress.startsWith(regionName)) {
+      address += regionName
+    }
+    if (communityName && !detailAddress.startsWith(communityName)) {
+      address += communityName
+    }
+    return address + detailAddress
+  })
 
   getHouseDetail()
 
@@ -45,9 +70,21 @@
 
 <template>
   <section class="bit-app-container houseDetail-page">
+    <el-alert
+      title="当前为房源详情（仅查看）。如需修改房源标签、设备等信息，请点击右上角「编辑」进入编辑页。"
+      type="info"
+      :closable="false"
+      show-icon
+      class="detail-tip"
+    />
     <el-card>
       <template #header>
-        <h2 class="title">房源信息</h2>
+        <div class="card-header">
+          <h2 class="title">房源信息</h2>
+          <el-button type="primary" link @click="goToEdit">
+            编辑
+          </el-button>
+        </div>
       </template>
       <el-row>
         <el-col :span="6">
@@ -60,15 +97,7 @@
         </el-col>
         <el-col :span="6">
           <span class="key">房源地址</span>
-          <span class="value">
-            {{
-              houseDetail.cityName +
-              '市' +
-              houseDetail.regionName +
-              houseDetail.communityName +
-              houseDetail.detailAddress
-            }}
-          </span>
+          <span class="value">{{ fullAddress }}</span>
         </el-col>
         <el-col :span="6">
           <span class="key">所属小区</span>
@@ -76,6 +105,12 @@
         </el-col>
         <el-col :span="6">
           <span class="key">房源类型</span>
+          <span class="value">
+            {{ HOUSE_RENT_TYPE_MAP[houseDetail.rentType] }}
+          </span>
+        </el-col>
+        <el-col :span="6">
+          <span class="key">户型</span>
           <span class="value">{{ houseDetail.houseType }}</span>
         </el-col>
         <el-col :span="6">
@@ -167,9 +202,17 @@
 
 <style lang="scss" scoped>
   .houseDetail-page {
+    .detail-tip {
+      margin-bottom: 15px;
+    }
     .el-card {
       padding: 10px;
       margin-bottom: 15px;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
     .title {
       font-size: 17px;
